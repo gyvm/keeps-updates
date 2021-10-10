@@ -7,7 +7,10 @@ from flask import render_template, Flask
 from dotenv import load_dotenv
 import gkeepapi
 
-bookmark_pages = []
+from bs4 import BeautifulSoup
+import requests
+
+bookmark_pages_map = {}
 
 app = Flask(__name__)
 
@@ -28,8 +31,8 @@ def index():
     for note in notes:
         is_bookmark(note)
 
-    print(bookmark_pages)
-    return render_template('index.html', bookmark_pages=bookmark_pages, date=now)
+    print(bookmark_pages_map)
+    return render_template('index.html', bookmark_pages_map=bookmark_pages_map, date=now)
 
 
 def is_bookmark(note):
@@ -38,7 +41,20 @@ def is_bookmark(note):
 
     if len(url) > 0:
         if url[0] != "":
-            bookmark_pages.append(url[0])
+            site_title = get_site_title(url[0])
+            if site_title != "":
+                bookmark_pages_map[url[0]] = site_title
+            else:
+                bookmark_pages_map[url[0]] = url[0]
+
+
+def get_site_title(url):
+
+    html = requests.get(url)
+    soup = BeautifulSoup(html.content, "html.parser")
+    site_title = soup.find("title").text
+
+    return site_title
 
 
 def list2link(list):

@@ -9,8 +9,8 @@
 <body>
     <h4>過去1週間で更新されたブックマーク</h4>
     <ul>
-        {% for bookmark_page in bookmark_pages %}
-        <li><a href="{{ bookmark_page }}">{{ bookmark_page }}</a></li>
+        {% for key, value in bookmark_pages_map.items() %}
+        <li><a href="{{ key }}">{{ value }}</a></li>
         {% endfor %}
     </ul>
 </body>
