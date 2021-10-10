@@ -1,9 +1,18 @@
-<div>
-    <p>ページ更新: {{date}}</p>
-    <p>keepのnoteリスト</p>
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
+<html lang="en">
+
+<head>
+    <title>keeps-updates</title>
+</head>
+
+<body>
+    <h4>過去1週間で更新されたブックマーク</h4>
     <ul>
-        {% for note in notes %}
-        <p>{{note.title}} : {{note.timestamps.updated}}</p>
+        {% for bookmark_page in bookmark_pages %}
+        <li><a href="{{ bookmark_page }}">{{ bookmark_page }}</a></li>
         {% endfor %}
     </ul>
-</div>
+</body>
+
+</html>

@@ -1,41 +1,50 @@
 from __future__ import print_function
 from os.path import os, join, dirname
 import datetime
+import re
 
 from flask import render_template, Flask
 from dotenv import load_dotenv
 import gkeepapi
+
+bookmark_pages = []
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
-
     keep = gkeepapi.Keep()
     success = login(keep)
     if not success:
-        return render_template('error.html', msg="Login failure", date=now)
+        print("error")
 
-    org_notes = keep.all()
-    notes = get_note_title(org_notes)
+    now = datetime.datetime.utcnow()
+    a_week_before = now + datetime.timedelta(days=-7)
 
-    return render_template('index.html', notes=notes, date=now)
+    notes = keep.find(
+        func=lambda note: note.timestamps.updated > a_week_before)
+
+    for note in notes:
+        is_bookmark(note)
+
+    print(bookmark_pages)
+    return render_template('index.html', bookmark_pages=bookmark_pages, date=now)
 
 
-def get_note_title(org_notes):
-    notes = []
+def is_bookmark(note):
+    pattern = "https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
+    url = re.findall(pattern, note.text)
 
-    for org_note in org_notes:
-        note = org_note
-        print(org_note)
-        if note.title == "":
-            note.title = note.text.replace(' ', '')[0:99]
+    if len(url) > 0:
+        if url[0] != "":
+            bookmark_pages.append(url[0])
 
-        notes.append(note)
 
-    return notes
+def list2link(list):
+    str = ','.join(["<a href='search?q=" + x +
+                   "'>" + x + "</a>" for x in list])
+    return str
 
 
 def login(keep):
