@@ -1,5 +1,9 @@
 <div>
-    <p>更新: {{date}}</p>
-    <p>keepのnoteのリスト</p>
-    <p>notes: {{notes.notes}}</p>
+    <p>ページ更新: {{date}}</p>
+    <p>keepのnoteリスト</p>
+    <ul>
+        {% for note in notes %}
+        <p>{{note.title}} : {{note.timestamps.updated}}</p>
+        {% endfor %}
+    </ul>
 </div>

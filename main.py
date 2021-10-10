@@ -1,63 +1,57 @@
 from __future__ import print_function
-import os.path
+from os.path import os, join, dirname
 import datetime
 
-# for get_credentials()
-from googleapiclient.discovery import build
-import google.auth
-
-# for get_oauth_credentials()
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-
 from flask import render_template, Flask
-
-SCOPES = ['https://www.googleapis.com/auth/keep']
-# SCOPES = ['https://www.googleapis.com/auth/keep.readonly']
+from dotenv import load_dotenv
+import gkeepapi
 
 app = Flask(__name__)
 
 
-@app.route("/keeps-updates")
+@app.route("/")
 def index():
     now = datetime.datetime.utcnow().isoformat() + 'Z'
 
-    creds = get_credentials()
-    # creds = get_oauth_credentials()
+    keep = gkeepapi.Keep()
+    success = login(keep)
+    if not success:
+        return render_template('error.html', msg="Login failure", date=now)
 
-    service = build('keep', 'v1', credentials=creds)
-    notes_result = service.notes().list(
-        pageSize=10).execute()
-    print(notes_result)
-
-    notes = {'notes': str(notes_result)}
+    org_notes = keep.all()
+    notes = get_note_title(org_notes)
 
     return render_template('index.html', notes=notes, date=now)
 
 
-def get_credentials():
-    creds = google.auth.load_credentials_from_file(
-        './credentials.json', SCOPES)[0]
+def get_note_title(org_notes):
+    notes = []
 
-    return creds
+    for org_note in org_notes:
+        note = org_note
+        print(org_note)
+        if note.title == "":
+            note.title = note.text.replace(' ', '')[0:99]
+
+        notes.append(note)
+
+    return notes
 
 
-def get_oauth_credentials():
-    creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
+def login(keep):
+    load_dotenv(verbose=True)
+    dotenv_path = join(dirname(__file__), '.env')
+    load_dotenv(dotenv_path)
 
-    return creds
+    username = os.environ.get("USERNAME")
+    password = os.environ.get("PASSWORD")
+
+    success = False
+    try:
+        keep.login(username, password)
+        success = True
+    finally:
+        return success
 
 
 if __name__ == "__main__":
