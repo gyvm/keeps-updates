@@ -1,4 +1,3 @@
-from __future__ import print_function
 from os.path import os, join, dirname
 import datetime
 import re
@@ -8,9 +7,10 @@ from dotenv import load_dotenv
 import gkeepapi
 
 from bs4 import BeautifulSoup
+import concurrent.futures
 import requests
 
-bookmark_pages_map = {}
+bookmark_pages_dict = {}
 
 app = Flask(__name__)
 
@@ -28,11 +28,11 @@ def index():
     notes = keep.find(
         func=lambda note: note.timestamps.updated > a_week_before)
 
-    for note in notes:
-        is_bookmark(note)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        [executor.submit(is_bookmark, note)
+         for note in notes]
 
-    print(bookmark_pages_map)
-    return render_template('index.html', bookmark_pages_map=bookmark_pages_map, date=now)
+    return render_template('index.html', bookmark_pages_dict=bookmark_pages_dict, date=now)
 
 
 def is_bookmark(note):
@@ -43,24 +43,17 @@ def is_bookmark(note):
         if url[0] != "":
             site_title = get_site_title(url[0])
             if site_title != "":
-                bookmark_pages_map[url[0]] = site_title
+                bookmark_pages_dict[url[0]] = site_title
             else:
-                bookmark_pages_map[url[0]] = url[0]
+                bookmark_pages_dict[url[0]] = url[0]
 
 
 def get_site_title(url):
-
     html = requests.get(url)
     soup = BeautifulSoup(html.content, "html.parser")
     site_title = soup.find("title").text
 
     return site_title
-
-
-def list2link(list):
-    str = ','.join(["<a href='search?q=" + x +
-                   "'>" + x + "</a>" for x in list])
-    return str
 
 
 def login(keep):
