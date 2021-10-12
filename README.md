@@ -50,6 +50,6 @@ gcloud run deploy
 **NOTE**
 If you have any questions, please check [deploy quickstarts](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/python#deploy).
 
-Setup login account and Click this:
+[Setup login account](#setup-login-account) and Click this:
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
