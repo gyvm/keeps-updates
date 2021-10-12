@@ -17,13 +17,13 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
+    now = datetime.datetime.utcnow()
+    a_week_before = now + datetime.timedelta(days=-7)
+
     keep = gkeepapi.Keep()
     success = login(keep)
     if not success:
-        print("error")
-
-    now = datetime.datetime.utcnow()
-    a_week_before = now + datetime.timedelta(days=-7)
+        return render_template('error.html', date=now)
 
     notes = keep.find(
         func=lambda note: note.timestamps.updated > a_week_before)
