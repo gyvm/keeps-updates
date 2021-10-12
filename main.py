@@ -57,15 +57,16 @@ def get_site_title(url):
 
 
 def login(keep):
-    load_dotenv(verbose=True)
-    dotenv_path = join(dirname(__file__), '.env')
-    load_dotenv(dotenv_path)
-
-    username = os.environ.get("USERNAME")
-    password = os.environ.get("PASSWORD")
-
     success = False
+
     try:
+        load_dotenv(verbose=True)
+        dotenv_path = join(dirname(__file__), '.env')
+        load_dotenv(dotenv_path)
+
+        username = os.environ.get("USERNAME")
+        password = os.environ.get("PASSWORD")
+
         keep.login(username, password)
         success = True
     finally:
