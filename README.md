@@ -10,7 +10,7 @@ Google Keepをリスト形式で表示するためのスクリプトです。<br
 ## Setup Login Account:
 Create `.env` File and Set `USERNAME` and `PASSWORD`:
 ```.env
-USERNAME =""
+USERNAME = ""
 PASSWORD = ""
 ```
 
@@ -20,8 +20,8 @@ You can generate an app password(for this app) on [apppasswords](https://myaccou
 ## Run locally:
 Setup Local Python Environment:
 ```
-python -m venv venv
-source venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt
 ```
