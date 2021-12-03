@@ -3,7 +3,7 @@ Google Keepをリスト形式で表示するためのスクリプトです。<br
 現状では、過去１週間以内のNoteからURLを抜き出して、リスト形式で表示できます。<br>
 
 ~~Google Keep APIが一般ユーザでも使用可能になるまで保留~~<br>
-[gkeepapi](https://gkeepapi.readthedocs.io/en/latest/#)で代用することにした。現在作成中。
+[gkeepapi](https://gkeepapi.readthedocs.io/en/latest/#)で代用することにした。
 
 ---
 
